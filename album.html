@@ -21,6 +21,7 @@
             background: #1a1714;
             font-family: 'Shippori Mincho', serif;
             min-height: 100vh;
+            overflow-x: hidden;
         }
 
         /* Back button */
@@ -48,8 +49,10 @@
         /* Title */
         .album-header {
             text-align: center;
-            padding: 50px 20px 30px;
+            padding: 50px 20px 20px;
             color: rgba(255, 255, 255, 0.6);
+            position: relative;
+            z-index: 5;
         }
 
         .album-header h1 {
@@ -64,42 +67,43 @@
             color: rgba(255, 255, 255, 0.35);
         }
 
-        /* Photo list */
-        .photo-list {
-            width: 92%;
-            max-width: 420px;
-            margin: 0 auto;
-            padding-bottom: 60px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
+        /* Scattered photo area */
+        .photo-scatter {
+            position: relative;
+            width: 100%;
+            padding: 10px 0 80px;
         }
 
         .photo-card {
-            border-radius: 8px;
-            overflow: hidden;
-            background: #2a2520;
+            position: relative;
+            width: 70%;
+            max-width: 340px;
+            border-radius: 6px;
+            overflow: visible;
+            margin-bottom: -40px;
             opacity: 0;
-            transform: translateY(30px);
             transition: opacity 0.6s ease, transform 0.6s ease;
         }
 
         .photo-card.visible {
             opacity: 1;
-            transform: translateY(0);
         }
 
         .photo-card img {
             width: 100%;
             display: block;
+            border-radius: 6px;
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.5);
         }
 
         /* Footer */
         .album-footer {
             text-align: center;
-            padding: 30px 20px 50px;
+            padding: 60px 20px 50px;
             color: rgba(255, 255, 255, 0.3);
             font-size: 0.8rem;
+            position: relative;
+            z-index: 5;
         }
     </style>
 </head>
@@ -113,7 +117,7 @@
         <p>KPC 52期 卒業演奏会</p>
     </div>
 
-    <div class="photo-list" id="photoList"></div>
+    <div class="photo-scatter" id="photoScatter"></div>
 
     <div class="album-footer">
         <p>2026年3月18日 KPC 52期</p>
@@ -130,12 +134,32 @@
             'albam/IMG_8904.JPG', 'albam/IMG_8905.JPG', 'albam/IMG_8906.JPG'
         ];
 
-        const list = document.getElementById('photoList');
+        const scatter = document.getElementById('photoScatter');
 
-        // Create photo cards
+        // Random helpers
+        function rand(min, max) {
+            return Math.random() * (max - min) + min;
+        }
+
+        // Create scattered photo cards
         photos.forEach((src, i) => {
             const card = document.createElement('div');
             card.className = 'photo-card';
+
+            // Random horizontal position (left or right leaning, alternating with randomness)
+            const side = i % 2 === 0 ? 'left' : 'right';
+            const xOffset = rand(5, 25);
+            const rotation = rand(-8, 8);
+
+            if (side === 'left') {
+                card.style.marginLeft = xOffset + '%';
+            } else {
+                card.style.marginLeft = (100 - 70 - xOffset) + '%';
+            }
+
+            card.style.transform = `rotate(${rotation}deg) translateY(20px)`;
+            card.dataset.rotation = rotation;
+            card.style.zIndex = i;
 
             const img = document.createElement('img');
             img.src = src;
@@ -143,17 +167,19 @@
             img.loading = i < 4 ? 'eager' : 'lazy';
 
             card.appendChild(img);
-            list.appendChild(card);
+            scatter.appendChild(card);
         });
 
-        // Scroll-triggered fade-in animation
+        // Scroll-triggered animation
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
+                    const rot = entry.target.dataset.rotation;
                     entry.target.classList.add('visible');
+                    entry.target.style.transform = `rotate(${rot}deg) translateY(0)`;
                 }
             });
-        }, { threshold: 0.1 });
+        }, { threshold: 0.15 });
 
         document.querySelectorAll('.photo-card').forEach(card => {
             observer.observe(card);
