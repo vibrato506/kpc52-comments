@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>演奏者コメント - KPC52期 卒業演奏会</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600&family=Yuji+Syuku&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #fcfaf6;
+            --text-color: #5c534f;
+            --accent-color: #c9bda5;
+            --font-main: 'Shippori Mincho', serif;
+            --font-accent: 'Yuji Syuku', serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 20px 15px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-main);
+            line-height: 1.8;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--accent-color);
+        }
+
+        h1 {
+            font-family: var(--font-accent);
+            font-size: 1.5rem;
+            color: #796e62;
+            margin: 0 0 10px 0;
+            font-weight: 400;
+        }
+
+        .subtitle {
+            font-size: 0.9rem;
+            color: #8c8378;
+            letter-spacing: 0.1em;
+        }
+
+        .comments-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .comment-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(201, 189, 165, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .comment-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background-color: var(--accent-color);
+        }
+
+        .performer-name {
+            font-family: var(--font-accent);
+            font-size: 1.2rem;
+            color: #796e62;
+            margin-bottom: 12px;
+            border-bottom: 1px dashed rgba(201, 189, 165, 0.4);
+            padding-bottom: 8px;
+        }
+
+        .comment-text {
+            font-size: 0.95rem;
+            white-space: pre-wrap;
+            color: var(--text-color);
+        }
+
+        .loading {
+            text-align: center;
+            color: #8c8378;
+            font-style: italic;
+            margin: 40px 0;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding-top: 20px;
+            font-size: 0.8rem;
+            color: #a19a91;
+            border-top: 1px dashed rgba(201, 189, 165, 0.4);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="subtitle">KPC 52期 卒業演奏会</div>
+        <h1>演奏者からのメッセージ</h1>
+    </header>
+
+    <div class="comments-container" id="comments-list">
+        <div class="loading">読み込み中...</div>
+    </div>
+
+    <footer>
+        <p>2026年3月18日 KPC 52期</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            fetch('comments.json')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('ネットワークエラーが発生しました');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const listContainer = document.getElementById('comments-list');
+                    listContainer.innerHTML = ''; // クリア
+
+                    // カードまたはセクションを生成して追加
+                    data.forEach(item => {
+                        // Section header
+                        if (item.type === 'section') {
+                            const sectionTitle = document.createElement('h2');
+                            sectionTitle.style.textAlign = 'center';
+                            sectionTitle.style.color = '#796e62';
+                            sectionTitle.style.marginTop = '40px';
+                            sectionTitle.style.marginBottom = '20px';
+                            sectionTitle.style.fontFamily = 'var(--font-accent)';
+                            sectionTitle.style.borderBottom = '1px dashed var(--accent-color)';
+                            sectionTitle.style.paddingBottom = '10px';
+                            sectionTitle.textContent = item.title;
+                            listContainer.appendChild(sectionTitle);
+                            return;
+                        }
+
+                        // Comment card
+                        if (!item['氏名'] || !item['演奏者コメント']) return;
+
+                        const name = item['氏名'];
+                        const comment = item['演奏者コメント'];
+
+                        const card = document.createElement('div');
+                        card.className = 'comment-card';
+
+                        const nameEl = document.createElement('div');
+                        nameEl.className = 'performer-name';
+                        nameEl.textContent = name;
+
+                        const textEl = document.createElement('div');
+                        textEl.className = 'comment-text';
+                        textEl.textContent = comment;
+
+                        card.appendChild(nameEl);
+                        card.appendChild(textEl);
+                        listContainer.appendChild(card);
+                    });
+                })
+                .catch(error => {
+                    console.error('Fetch error:', error);
+                    const listContainer = document.getElementById('comments-list');
+                    listContainer.innerHTML = '<div class="loading" style="color:red;">データの読み込みに失敗しました。</div>';
+                });
+        });
+    </script>
+</body>
+</html>
