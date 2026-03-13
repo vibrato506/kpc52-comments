@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>52期のアルバム - KPC52期 卒業演奏会</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600&display=swap"
+        rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #1a1714;
+            font-family: 'Shippori Mincho', serif;
+            overflow: hidden;
+            height: 100vh;
+            height: 100dvh;
+            width: 100vw;
+        }
+
+        /* Back button */
+        .back-btn {
+            position: fixed;
+            top: 12px;
+            left: 12px;
+            z-index: 20;
+            color: rgba(255, 255, 255, 0.5);
+            text-decoration: none;
+            font-size: 0.8rem;
+            padding: 6px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            transition: all 0.3s;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(5px);
+        }
+
+        .back-btn:hover {
+            color: rgba(255, 255, 255, 0.9);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Title */
+        .title-overlay {
+            position: fixed;
+            top: 14px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            z-index: 10;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.8rem;
+            letter-spacing: 0.2em;
+            pointer-events: none;
+        }
+
+        /* Counter */
+        .counter {
+            position: fixed;
+            bottom: 12px;
+            right: 16px;
+            color: rgba(255, 255, 255, 0.35);
+            font-size: 0.75rem;
+            letter-spacing: 0.1em;
+            z-index: 10;
+        }
+
+        /* Single column scroll track */
+        .scroll-viewport {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+        }
+
+        .scroll-track {
+            width: 92%;
+            max-width: 420px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 10px 0;
+            transition: transform 1s cubic-bezier(0.45, 0, 0.15, 1);
+        }
+
+        .photo-card {
+            flex-shrink: 0;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #2a2520;
+        }
+
+        .photo-card img {
+            width: 100%;
+            display: block;
+        }
+
+        /* Pause indicator */
+        .pause-indicator {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 3rem;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 20;
+            pointer-events: none;
+        }
+
+        .pause-indicator.show {
+            opacity: 1;
+        }
+    </style>
+</head>
+
+<body>
+
+    <a href="index.html" class="back-btn">← 戻る</a>
+    <div class="title-overlay">52期のアルバム</div>
+
+    <div class="scroll-viewport" id="viewport">
+        <div class="scroll-track" id="track"></div>
+    </div>
+
+    <div class="counter" id="counter"></div>
+    <div class="pause-indicator" id="pauseIndicator">⏸</div>
+
+    <script>
+        const photos = [
+            'albam/IMG_8886.JPG', 'albam/IMG_8887.JPG', 'albam/IMG_8888.JPG',
+            'albam/IMG_8889.JPG', 'albam/IMG_8890.JPG', 'albam/IMG_8891.JPG',
+            'albam/IMG_8892.JPG', 'albam/IMG_8893.JPG', 'albam/IMG_8894.JPG',
+            'albam/IMG_8895.JPG', 'albam/IMG_8896.JPG', 'albam/IMG_8897.JPG',
+            'albam/IMG_8898.JPG', 'albam/IMG_8899.JPG', 'albam/IMG_8900.JPG',
+            'albam/IMG_8901.JPG', 'albam/IMG_8902.JPG', 'albam/IMG_8903.JPG',
+            'albam/IMG_8904.JPG', 'albam/IMG_8905.JPG', 'albam/IMG_8906.JPG'
+        ];
+
+        const INTERVAL = 3000; // 3s per scroll
+        let currentIndex = 0;
+        let isPaused = false;
+        let timer = null;
+
+        const track = document.getElementById('track');
+        const counter = document.getElementById('counter');
+        const pauseIndicator = document.getElementById('pauseIndicator');
+
+        // Create photo cards
+        photos.forEach((src, i) => {
+            const card = document.createElement('div');
+            card.className = 'photo-card';
+
+            const img = document.createElement('img');
+            img.src = src;
+            img.alt = `写真 ${i + 1}`;
+            img.loading = i < 5 ? 'eager' : 'lazy';
+
+            card.appendChild(img);
+            track.appendChild(card);
+        });
+
+        // Get card heights after images load
+        let cardHeights = [];
+        let gap = 10;
+
+        function measureCards() {
+            const cards = track.querySelectorAll('.photo-card');
+            cardHeights = Array.from(cards).map(c => c.offsetHeight);
+        }
+
+        function getOffset(index) {
+            let offset = 0;
+            for (let i = 0; i < index; i++) {
+                offset += (cardHeights[i] || 0) + gap;
+            }
+            return offset;
+        }
+
+        function scrollToIndex(index) {
+            const offset = getOffset(index);
+            track.style.transform = `translateY(-${offset}px)`;
+            updateCounter();
+        }
+
+        function updateCounter() {
+            counter.textContent = `${currentIndex + 1} / ${photos.length}`;
+        }
+
+        function next() {
+            currentIndex++;
+            // Loop back
+            if (currentIndex >= photos.length) {
+                currentIndex = 0;
+                // Instant jump back to top
+                track.style.transition = 'none';
+                scrollToIndex(0);
+                track.offsetHeight; // force reflow
+                track.style.transition = 'transform 1s cubic-bezier(0.45, 0, 0.15, 1)';
+                return;
+            }
+            scrollToIndex(currentIndex);
+        }
+
+        function prev() {
+            currentIndex = (currentIndex - 1 + photos.length) % photos.length;
+            scrollToIndex(currentIndex);
+        }
+
+        function togglePause() {
+            isPaused = !isPaused;
+            pauseIndicator.textContent = isPaused ? '⏸' : '▶';
+            pauseIndicator.classList.add('show');
+            setTimeout(() => pauseIndicator.classList.remove('show'), 800);
+
+            if (isPaused) {
+                clearInterval(timer);
+            } else {
+                timer = setInterval(next, INTERVAL);
+            }
+        }
+
+        // Click to pause
+        document.getElementById('viewport').addEventListener('click', (e) => {
+            if (e.target.tagName === 'A') return;
+            togglePause();
+        });
+
+        // Keyboard
+        document.addEventListener('keydown', (e) => {
+            if (e.key === ' ') {
+                e.preventDefault();
+                togglePause();
+            } else if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+                clearInterval(timer);
+                next();
+                if (!isPaused) timer = setInterval(next, INTERVAL);
+            } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+                clearInterval(timer);
+                prev();
+                if (!isPaused) timer = setInterval(next, INTERVAL);
+            }
+        });
+
+        // Touch swipe (mobile)
+        let touchStartY = 0;
+        document.addEventListener('touchstart', (e) => {
+            touchStartY = e.touches[0].clientY;
+        }, { passive: true });
+
+        document.addEventListener('touchend', (e) => {
+            const dy = touchStartY - e.changedTouches[0].clientY;
+            if (Math.abs(dy) > 40) {
+                clearInterval(timer);
+                if (dy > 0) next(); else prev();
+                if (!isPaused) timer = setInterval(next, INTERVAL);
+            }
+        }, { passive: true });
+
+        // Start after images load
+        window.addEventListener('load', () => {
+            measureCards();
+            updateCounter();
+            timer = setInterval(next, INTERVAL);
+
+            window.addEventListener('resize', () => {
+                measureCards();
+                scrollToIndex(currentIndex);
+            });
+        });
+    </script>
+
+</body>
+
+</html>
