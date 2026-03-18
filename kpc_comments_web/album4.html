@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>52期のアルバム (4/6) - KPC52期 卒業演奏会</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600&display=swap"
+        rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #1a1714;
+            font-family: 'Shippori Mincho', serif;
+            min-height: 100vh;
+        }
+
+        /* Back button */
+        .back-btn {
+            position: fixed;
+            top: 12px;
+            left: 12px;
+            z-index: 20;
+            color: rgba(255, 255, 255, 0.5);
+            text-decoration: none;
+            font-size: 0.8rem;
+            padding: 6px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            transition: all 0.3s;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .back-btn:hover {
+            color: rgba(255, 255, 255, 0.9);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Title */
+        .album-header {
+            text-align: center;
+            padding: 50px 20px 30px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .album-header h1 {
+            font-size: 1.2rem;
+            font-weight: 400;
+            letter-spacing: 0.2em;
+            margin-bottom: 8px;
+        }
+
+        .album-header p {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.35);
+        }
+
+        /* Photo list */
+        .photo-list {
+            width: 92%;
+            max-width: 420px;
+            margin: 0 auto;
+            padding-bottom: 60px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .photo-card {
+            border-radius: 8px;
+            overflow: hidden;
+            background: #2a2520;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .photo-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .photo-card img {
+            width: 100%;
+            display: block;
+        }
+
+        /* Footer */
+        .album-footer {
+            text-align: center;
+            padding: 30px 20px 50px;
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <a href="index.html" class="back-btn">← 戻る</a>
+
+    <div class="album-header">
+        <h1>52期のアルバム (4/6)</h1>
+        <p>KPC 52期 卒業演奏会</p>
+    </div>
+
+    <div class="photo-list" id="photoList"></div>
+
+    <div style="text-align: center; margin-bottom: 30px;">
+        <a href="album3.html" style="color: rgba(255,255,255,0.7); text-decoration: none; border: 1px solid rgba(255,255,255,0.3); padding: 8px 16px; border-radius: 20px; margin-right: 10px;">← 前のページ</a>
+        <a href="album5.html" style="color: rgba(255,255,255,0.7); text-decoration: none; border: 1px solid rgba(255,255,255,0.3); padding: 8px 16px; border-radius: 20px;">次のページ →</a>
+    </div>
+    <div class="album-footer">
+        <p>2026年3月18日 KPC 52期</p>
+    </div>
+
+    <script>
+        const photos = [
+            
+        ];
+
+        const list = document.getElementById('photoList');
+
+        // Create photo cards
+        photos.forEach((src, i) => {
+            const card = document.createElement('div');
+            card.className = 'photo-card';
+
+            const img = document.createElement('img');
+            img.src = src;
+            img.alt = `写真 ${i + 1}`;
+            img.loading = i < 4 ? 'eager' : 'lazy';
+
+            card.appendChild(img);
+            list.appendChild(card);
+        });
+
+        // Scroll-triggered fade-in animation
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.photo-card').forEach(card => {
+            observer.observe(card);
+        });
+    </script>
+
+</body>
+
+</html>
