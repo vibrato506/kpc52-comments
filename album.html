@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>52期のアルバム - KPC52期 卒業演奏会</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600&display=swap"
+        rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #1a1714;
+            font-family: 'Shippori Mincho', serif;
+            min-height: 100vh;
+        }
+
+        /* Back button */
+        .back-btn {
+            position: fixed;
+            top: 12px;
+            left: 12px;
+            z-index: 20;
+            color: rgba(255, 255, 255, 0.5);
+            text-decoration: none;
+            font-size: 0.8rem;
+            padding: 6px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            transition: all 0.3s;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .back-btn:hover {
+            color: rgba(255, 255, 255, 0.9);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Title */
+        .album-header {
+            text-align: center;
+            padding: 50px 20px 30px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .album-header h1 {
+            font-size: 1.2rem;
+            font-weight: 400;
+            letter-spacing: 0.2em;
+            margin-bottom: 8px;
+        }
+
+        .album-header p {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.35);
+        }
+
+        /* Photo list */
+        .photo-list {
+            width: 92%;
+            max-width: 420px;
+            margin: 0 auto;
+            padding-bottom: 60px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .photo-card {
+            border-radius: 8px;
+            overflow: hidden;
+            background: #2a2520;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .photo-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .photo-card img {
+            width: 100%;
+            display: block;
+        }
+
+        /* Footer */
+        .album-footer {
+            text-align: center;
+            padding: 30px 20px 50px;
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <a href="index.html" class="back-btn">← 戻る</a>
+
+    <div class="album-header">
+        <h1>52期のアルバム</h1>
+        <p>KPC 52期 卒業演奏会</p>
+    </div>
+
+    <div class="photo-list" id="photoList"></div>
+
+    <div class="album-footer">
+        <p>2026年3月18日 KPC 52期</p>
+    </div>
+
+    <script>
+        const photos = [
+            'albam/35F9585F-E1C9-4C9B-9187-03BB60A9D988 2.jpeg',
+            'albam/4799506284132204747.06cab0db3a3aefe828ce6e68214415ef.22092716.jpeg',
+            'albam/4799506284132204747.3c251f618e4ac9d0b7c5695f7f7f352b.22092803.jpeg',
+            'albam/4799506284132204747.5d569fe1d7960ab865b85be12d6cf521.22092716.jpeg',
+            'albam/4799506284132204747.68a60525795fe366187eef62caaa3e54.22092716.jpeg',
+            'albam/4799506284132204747.7aa5ad7e7201f9d2eaa2161ba207507c.22092803.jpeg',
+            'albam/4799506284132204747.a58320c854605f412a4c9b2bace2cc61.22092803.jpeg',
+            'albam/4808422314759434481.1216fedd641df5566443e3699ced7692.22102216.jpeg',
+            'albam/4808422314759434481.2082cbd735ee234de9558c218f30f55b.22102213.jpeg',
+            'albam/4808422314759434481.38a85867f9bf71c8e7158eb45a157447.22102213.jpeg',
+            'albam/4808422314759434481.49032835db6c093e1e696eeb2153ea10.22102213.jpeg',
+            'albam/4808422314759434481.4cf72170b606a3929202c7daf4abec7c.22102213.jpeg',
+            'albam/4808422314759434481.51865e5626227c04b6054b2166362e31.22102216.jpeg',
+            'albam/4808422314759434481.58de0a45564091ada8b331ed9383b8cd.22102213.jpeg',
+            'albam/4808422314759434481.64131d6059aa269adad08f58adfc4e02.22102213.jpeg',
+            'albam/4869738967346813224.098392c68e27a7feaa349b722b0fe2bd.23040910.jpeg',
+            'albam/4869738967346813224.1f5457a6c5c89f6425ea14b0824a99d1.23040910.jpeg',
+            'albam/4869738967346813224.536a0c2bac76136b381e6628c614fa52.23040910.jpeg',
+            'albam/4869738967346813224.661b1963982c943b28d243dd6207abff.23040910.jpeg',
+            'albam/4869738967346813224.6dfa3cbf683266703476e2d985740bf0.23040910.jpeg',
+            'albam/4869738967346813224.80d36e1f0957f03091da9a30661dc174.23040910.jpeg',
+            'albam/4869738967346813224.a7cd612a407520da2fac654ab4c7c2b5.23040910.jpeg',
+            'albam/4869738967346813224.fab6a6b27ce2d78d0aee0e9f467a5f76.23040910.jpeg',
+            'albam/4912096761647013927.90e39cca5b2ba817da7407d74a32806d.23080407.jpeg',
+            'albam/4912554014493577642.2e42695f23acb1406964a3bbc15398b5.23080515.jpeg',
+            'albam/4912554014493577642.4a7a1649aa7c63cc59a473e09e26b759.23080514.jpeg',
+            'albam/4912554014493577642.928281f96fcd56b047483803c3e4ebac.23080515.jpeg',
+            'albam/4921482144192343876.f882019c67cc7c9d43f16a1ca0d18f69.23083006.jpeg',
+            'albam/IMG_0086.jpeg',
+            'albam/IMG_0101.jpeg',
+            'albam/IMG_0106.jpeg',
+            'albam/IMG_0129.jpeg',
+            'albam/IMG_0140.jpeg',
+            'albam/IMG_0172.jpeg',
+            'albam/IMG_0824.jpeg',
+            'albam/IMG_0825.jpeg',
+            'albam/IMG_1095.jpeg',
+            'albam/IMG_1100.jpeg',
+            'albam/IMG_1106.jpeg',
+            'albam/IMG_1107.jpeg',
+            'albam/IMG_1525.jpeg',
+            'albam/IMG_1724.jpeg',
+            'albam/IMG_1739.jpeg',
+            'albam/IMG_1744.jpeg',
+            'albam/IMG_2170.jpeg',
+            'albam/IMG_2389.jpeg',
+            'albam/IMG_2394.jpeg',
+            'albam/IMG_2397.jpeg',
+            'albam/IMG_2450.jpeg',
+            'albam/IMG_2462.jpeg',
+            'albam/IMG_2465.jpeg',
+            'albam/IMG_2470.jpeg',
+            'albam/IMG_2471.jpeg',
+            'albam/IMG_2720.jpeg',
+            'albam/IMG_3017.jpeg',
+            'albam/IMG_3742.jpeg',
+            'albam/IMG_3963.jpeg',
+            'albam/IMG_3971.jpeg',
+            'albam/IMG_3973.jpeg',
+            'albam/IMG_3975.jpeg',
+            'albam/IMG_4349.jpeg',
+            'albam/IMG_4563.jpeg',
+            'albam/IMG_4564.jpeg',
+            'albam/IMG_4917.jpeg',
+            'albam/IMG_4928.jpeg',
+            'albam/IMG_4930.jpeg',
+            'albam/IMG_5075.jpeg',
+            'albam/IMG_5256.jpeg',
+            'albam/IMG_5259.jpeg',
+            'albam/IMG_5263.jpeg',
+            'albam/IMG_5546.jpeg',
+            'albam/IMG_5663.jpeg',
+            'albam/IMG_5693.jpeg',
+            'albam/IMG_5709.jpeg',
+            'albam/IMG_5971.jpeg',
+            'albam/IMG_6802.jpeg',
+            'albam/IMG_6803.jpeg',
+            'albam/IMG_6805.jpeg',
+            'albam/IMG_6873.jpeg',
+            'albam/IMG_7022.jpeg',
+            'albam/IMG_7025.jpeg',
+            'albam/IMG_7414.jpeg',
+            'albam/IMG_7672.jpeg',
+            'albam/IMG_7673.jpeg',
+            'albam/IMG_7674.jpeg',
+            'albam/IMG_8785.jpeg',
+            'albam/IMG_9246.jpeg',
+            'albam/IMG_9268.jpeg',
+            'albam/IMG_9272.jpeg',
+            'albam/IMG_9927.jpeg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_1.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_10.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_100.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_101.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_102.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_103.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_104.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_105.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_106.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_107.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_108.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_109.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_11.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_110.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_111.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_112.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_113.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_114.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_115.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_116.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_117.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_118.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_119.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_12.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_120.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_121.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_122.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_123.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_124.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_125.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_126.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_127.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_128.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_129.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_13.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_130.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_131.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_132.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_133.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_134.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_135.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_136.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_137.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_138.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_139.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_14.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_140.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_141.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_142.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_143.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_144.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_145.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_146.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_147.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_148.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_149.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_15.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_150.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_151.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_152.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_153.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_154.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_155.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_156.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_157.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_158.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_159.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_16.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_160.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_161.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_162.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_163.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_164.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_165.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_166.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_167.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_168.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_169.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_17.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_170.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_171.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_172.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_173.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_174.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_175.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_18.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_19.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_2.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_20.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_21.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_22.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_23.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_24.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_25.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_26.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_27.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_28.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_29.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_3.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_30.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_31.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_32.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_33.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_34.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_35.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_36.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_37.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_38.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_39.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_4.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_40.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_41.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_42.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_43.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_44.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_45.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_46.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_47.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_48.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_49.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_5.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_50.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_51.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_52.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_53.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_54.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_55.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_56.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_57.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_58.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_59.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_6.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_60.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_61.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_62.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_63.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_64.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_65.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_66.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_67.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_68.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_69.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_7.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_70.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_71.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_72.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_73.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_74.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_75.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_76.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_77.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_78.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_79.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_8.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_80.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_81.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_82.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_83.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_84.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_85.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_86.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_87.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_88.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_89.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_9.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_90.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_91.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_92.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_93.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_94.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_95.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_96.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_97.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_98.jpg',
+            'albam/LINE_ALBUM_アルバムつくるよ！_260318_99.jpg'
+        ];
+
+        const list = document.getElementById('photoList');
+
+        // Create photo cards
+        photos.forEach((src, i) => {
+            const card = document.createElement('div');
+            card.className = 'photo-card';
+
+            const img = document.createElement('img');
+            img.src = src;
+            img.alt = `写真 ${i + 1}`;
+            img.loading = i < 4 ? 'eager' : 'lazy';
+
+            card.appendChild(img);
+            list.appendChild(card);
+        });
+
+        // Scroll-triggered fade-in animation
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.photo-card').forEach(card => {
+            observer.observe(card);
+        });
+    </script>
+
+</body>
+
+</html>
